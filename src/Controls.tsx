@@ -45,10 +45,14 @@ function Controls({ getCanvas }: { getCanvas: () => FabricCanvas }) {
         height: 0,
         left: x,
         top: y,
-        borderColor: "red",
+        borderColor: "black",
         borderDashArray: [5, 5],
-        fill: "white",
+        fill: "transparent",
         uniformScaling: false,
+        cornerColor: "blue",
+        transparentCorners: false,
+        cornerStrokeColor: "white",
+        cornerStyle: "circle",
       });
 
       canvas.add(square);
@@ -121,6 +125,7 @@ function Controls({ getCanvas }: { getCanvas: () => FabricCanvas }) {
         }
 
         canvas.renderAll();
+        selectionRef.current = square as Rect;
       }
     }
 
