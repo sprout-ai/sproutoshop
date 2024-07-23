@@ -1,0 +1,28 @@
+#root {
+  margin: 0 auto;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  height: 80px;
+}
+
+.canvas_container {
+  background: grey;
+  height: calc(100vh - 80px);
+}
+
+
+.selection {
+  color: black;
+}
+.selection--active {
+  background: green;
+}
+.selection--inactive {
+  background: #fff;
+}
