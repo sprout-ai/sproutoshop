@@ -5,6 +5,7 @@ import { useRef } from "react";
 import { FabricImage } from "fabric";
 import { Canvas } from "./Canvas.tsx";
 import { Controls } from "./Controls.tsx";
+import { Thumbnails } from "./Thumbnails.tsx";
 
 function App() {
   // elements
@@ -72,8 +73,11 @@ function App() {
         <Controls getCanvas={getCanvas} />
       </div>
 
-      <div className={styles.canvas_container} ref={canvasContainerRef}>
-        <Canvas ref={canvasRef} onLoad={onLoad} />
+      <div className={styles.canvas_container}>
+        <Thumbnails />
+        <div ref={canvasContainerRef} style={{ width: "100%" }}>
+          <Canvas ref={canvasRef} onLoad={onLoad} />
+        </div>
       </div>
     </div>
   );

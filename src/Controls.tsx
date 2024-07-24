@@ -1,6 +1,6 @@
 import type { Canvas as FabricCanvas } from "fabric";
 import { useEffect, useRef, useState } from "react";
-import { FabricImage, Rect } from "fabric";
+import { Rect } from "fabric";
 
 import styles from "./Controls.module.css";
 
@@ -215,8 +215,8 @@ function Controls({ getCanvas }: { getCanvas: () => FabricCanvas }) {
     const image = canvas.getObjects().find((object) => object.isType("image"));
 
     if (square && image) {
-      console.log(square.oCoords);
       setSelectionCoords(square.oCoords);
+
       const cropped = new Image();
       cropped.src = canvas.toDataURL({
         left: square.left,
@@ -228,16 +228,16 @@ function Controls({ getCanvas }: { getCanvas: () => FabricCanvas }) {
         multiplier: 1,
       });
       cropped.onload = () => {
-        const newImage = new FabricImage(cropped, {
-          left: square.left,
-          top: square.top,
+        const event = new CustomEvent("add-thumbnail", {
+          detail: { url: cropped.src },
         });
-        newImage.setCoords();
-        canvas.remove(image);
+        document.dispatchEvent(event);
+
+        // const newImage = new FabricImage(cropped, {
+        //   left: square.left,
+        //   top: square.top,
+        // });
         canvas.remove(square);
-        canvas.add(newImage);
-        canvas.bringObjectToFront(newImage);
-        canvas.centerObject(newImage);
         canvas.renderAll();
       };
     }

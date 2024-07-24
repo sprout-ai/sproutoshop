@@ -13,6 +13,31 @@
 
 .canvas_container {
   background: grey;
+  display: flex;
   height: calc(100vh - 80px);
+  width: 100%;
 }
 
+.thumbnails {
+  background: white;
+  display: flex;
+  flex-direction: column;
+  flex: 0 0 150px;
+  gap: 8px;
+}
+
+.thumbnail {
+  height: 0;
+  overflow: hidden;
+  position: relative;
+  padding-top: 100%;
+
+  & img {
+    height: 100%;
+    object-fit: cover;
+    width: 100%;
+    position:absolute;
+    top: 0;
+    left: 0;
+  }
+}
