@@ -24,6 +24,7 @@
   flex-direction: column;
   flex: 0 0 150px;
   gap: 8px;
+  overflow-y: auto;
 }
 
 .thumbnail {
@@ -34,7 +35,7 @@
 
   & img {
     height: 100%;
-    object-fit: cover;
+    object-fit: contain;
     width: 100%;
     position:absolute;
     top: 0;
