@@ -29,7 +29,9 @@ function App() {
     const { width, height } = getCanvasContainerDimensions();
     canvas.setDimensions({ width, height });
 
-    const oImg = await loadImage("/receipt.jpg");
+    const oImg = await loadImage(
+      import.meta.env.DEV ? "/receipt.jpg" : "sproutoshop/receipt.jpg",
+    );
     oImg.set({
       hasBorders: false,
       hasControls: false,
