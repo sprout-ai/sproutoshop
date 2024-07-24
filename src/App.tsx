@@ -14,7 +14,7 @@ function App() {
   // canvas
   const canvasRef = useRef<FabricCanvas>(null);
 
-  const getCanvas = () => canvasRef.current;
+  const getCanvas = () => canvasRef.current as FabricCanvas;
 
   const getCanvasContainerDimensions = () => {
     const { width, height } =
