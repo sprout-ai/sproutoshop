@@ -1,0 +1,21 @@
+.container {
+  display: flex;
+  gap: 8px;
+  padding: 8px;
+}
+
+.button {
+  color: black;
+  padding: 8px;
+  cursor: pointer;
+}
+
+.selection {
+
+}
+.selection--active {
+  background: green;
+}
+.selection--inactive {
+  background: inherit;
+}

@@ -1,4 +1,4 @@
-import "./App.css";
+import styles from "./App.module.css";
 
 import type { Canvas as FabricCanvas } from "fabric";
 import { useRef } from "react";
@@ -67,12 +67,12 @@ function App() {
   };
 
   return (
-    <div className="container">
-      <div className="header" ref={headerRef}>
+    <div className={styles.container}>
+      <div className={styles.header} ref={headerRef}>
         <Controls getCanvas={getCanvas} />
       </div>
 
-      <div className="canvas_container" ref={canvasContainerRef}>
+      <div className={styles.canvas_container} ref={canvasContainerRef}>
         <Canvas ref={canvasRef} onLoad={onLoad} />
       </div>
     </div>

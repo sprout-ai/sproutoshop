@@ -1,10 +1,13 @@
 import type { Canvas as FabricCanvas } from "fabric";
 import { useEffect, useRef, useState } from "react";
-import { Rect } from "fabric";
+import { FabricImage, Rect } from "fabric";
+
+import styles from "./Controls.module.css";
 
 function Controls({ getCanvas }: { getCanvas: () => FabricCanvas }) {
   const selectionRef = useRef<Rect | null>(null);
   const [isSelectionActive, setIsSelectionActive] = useState(false);
+  const [hasSelection, setHasSelection] = useState(false);
 
   useEffect(() => {
     const canvas = getCanvas();
@@ -23,6 +26,8 @@ function Controls({ getCanvas }: { getCanvas: () => FabricCanvas }) {
       if (event.target === selectionRef.current) {
         return false;
       }
+
+      setHasSelection(false);
 
       // ensure object does not preserve aspect ratio
       canvas.set("uniformScaling", true);
@@ -53,6 +58,9 @@ function Controls({ getCanvas }: { getCanvas: () => FabricCanvas }) {
         transparentCorners: false,
         cornerStrokeColor: "white",
         cornerStyle: "circle",
+      });
+      square.setControlsVisibility({
+        mtr: false,
       });
 
       canvas.add(square);
@@ -144,9 +152,38 @@ function Controls({ getCanvas }: { getCanvas: () => FabricCanvas }) {
         if (!height && !width) {
           canvas.remove(square);
         } else {
+          // check if square exceeds image bounds
+          const image = canvas
+            .getObjects()
+            .find((object) => object.isType("image"));
+
+          if (image) {
+            const imageWidth = image.get("width");
+            const imageHeight = image.get("height");
+            const imageLeft = image.get("left");
+            const imageTop = image.get("top");
+
+            if (square.left < imageLeft) {
+              square.left = imageLeft;
+            }
+            if (square.top < imageTop) {
+              square.top = imageTop;
+            }
+            if (square.left + square.width > imageLeft + imageWidth) {
+              square.width = imageWidth - square.left + imageLeft;
+            }
+            if (square.top + square.height > imageTop + imageHeight) {
+              square.height = imageHeight - square.top + imageTop;
+            }
+          }
+
           canvas.remove(square);
           canvas.add(square);
+          square.setControlsVisibility({
+            mtr: true,
+          });
           canvas.setActiveObject(square);
+          setHasSelection(true);
         }
 
         canvas.renderAll();
@@ -170,19 +207,62 @@ function Controls({ getCanvas }: { getCanvas: () => FabricCanvas }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [getCanvas, isSelectionActive]);
 
+  const handleCrop = () => {
+    const canvas = getCanvas();
+    const square = canvas.getActiveObject();
+    const image = canvas.getObjects().find((object) => object.isType("image"));
+
+    if (square && image) {
+      const cropped = new Image();
+      cropped.src = canvas.toDataURL({
+        left: square.left,
+        top: square.top,
+        width: square.width,
+        height: square.height,
+        multiplier: 1,
+      });
+      cropped.onload = () => {
+        const newImage = new FabricImage(cropped, {
+          left: square.left,
+          top: square.top,
+        });
+        newImage.setCoords();
+        canvas.remove(image);
+        canvas.remove(square);
+        canvas.add(newImage);
+        canvas.bringObjectToFront(newImage);
+        canvas.centerObject(newImage);
+        canvas.renderAll();
+      };
+    }
+  };
+
   return (
-    <>
+    <div className={styles.container}>
       <button
         className={
           isSelectionActive
-            ? "selection selection--active"
-            : "selection selection--inactive"
+            ? [
+                styles.button,
+                styles.selection,
+                styles["selection--active"],
+              ].join(" ")
+            : [
+                styles.button,
+                styles.selection,
+                styles["selection--inactive"],
+              ].join(" ")
         }
         onClick={() => setIsSelectionActive((prevState) => !prevState)}
       >
         Rectangular Selection
       </button>
-    </>
+      {hasSelection && (
+        <button className={styles.button} onClick={handleCrop}>
+          Crop
+        </button>
+      )}
+    </div>
   );
 }
 

@@ -16,13 +16,3 @@
   height: calc(100vh - 80px);
 }
 
-
-.selection {
-  color: black;
-}
-.selection--active {
-  background: green;
-}
-.selection--inactive {
-  background: #fff;
-}
