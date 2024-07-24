@@ -1,7 +1,12 @@
 .container {
   display: flex;
-  gap: 8px;
   padding: 8px;
+  justify-content: space-between;
+}
+
+.buttons {
+  display: flex;
+  gap: 8px;
 }
 
 .button {

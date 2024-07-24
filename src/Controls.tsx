@@ -8,6 +8,7 @@ function Controls({ getCanvas }: { getCanvas: () => FabricCanvas }) {
   const selectionRef = useRef<Rect | null>(null);
   const [isSelectionActive, setIsSelectionActive] = useState(false);
   const [hasSelection, setHasSelection] = useState(false);
+  const [selectionCoords, setSelectionCoords] = useState<any>();
 
   useEffect(() => {
     const canvas = getCanvas();
@@ -163,6 +164,7 @@ function Controls({ getCanvas }: { getCanvas: () => FabricCanvas }) {
             const imageLeft = image.get("left");
             const imageTop = image.get("top");
 
+            // if it does, adjust the square
             if (square.left < imageLeft) {
               square.left = imageLeft;
             }
@@ -213,12 +215,16 @@ function Controls({ getCanvas }: { getCanvas: () => FabricCanvas }) {
     const image = canvas.getObjects().find((object) => object.isType("image"));
 
     if (square && image) {
+      console.log(square.oCoords);
+      setSelectionCoords(square.oCoords);
       const cropped = new Image();
       cropped.src = canvas.toDataURL({
         left: square.left,
         top: square.top,
         width: square.width,
         height: square.height,
+
+        format: "jpeg",
         multiplier: 1,
       });
       cropped.onload = () => {
@@ -239,29 +245,44 @@ function Controls({ getCanvas }: { getCanvas: () => FabricCanvas }) {
 
   return (
     <div className={styles.container}>
-      <button
-        className={
-          isSelectionActive
-            ? [
-                styles.button,
-                styles.selection,
-                styles["selection--active"],
-              ].join(" ")
-            : [
-                styles.button,
-                styles.selection,
-                styles["selection--inactive"],
-              ].join(" ")
-        }
-        onClick={() => setIsSelectionActive((prevState) => !prevState)}
-      >
-        Rectangular Selection
-      </button>
-      {hasSelection && (
-        <button className={styles.button} onClick={handleCrop}>
-          Crop
+      <div className={styles.buttons}>
+        <button
+          className={
+            isSelectionActive
+              ? [
+                  styles.button,
+                  styles.selection,
+                  styles["selection--active"],
+                ].join(" ")
+              : [
+                  styles.button,
+                  styles.selection,
+                  styles["selection--inactive"],
+                ].join(" ")
+          }
+          onClick={() => setIsSelectionActive((prevState) => !prevState)}
+        >
+          Rectangular Selection
         </button>
-      )}
+        {hasSelection && (
+          <button className={styles.button} onClick={handleCrop}>
+            Crop
+          </button>
+        )}
+      </div>
+
+      <div>
+        {selectionCoords && (
+          <div>
+            <p style={{ fontSize: "12px" }}>
+              Crop: {`{`} tl: [{selectionCoords.tl.x}, {selectionCoords.tl.y}],
+              tr: [{selectionCoords.tr.x}, {selectionCoords.tr.y}], bl: [
+              {selectionCoords.bl.x}, {selectionCoords.bl.y}], br: [
+              {selectionCoords.br.x}, {selectionCoords.br.y}] {`}`}
+            </p>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
