@@ -1,6 +1,7 @@
 {
   "name": "sproutoshop",
-  "private": true,
+  "private": false,
+  "homepage": "https://sprout-ai.github.io/sproutoshop/",
   "version": "0.0.0",
   "type": "module",
   "scripts": {

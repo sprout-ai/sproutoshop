@@ -14,23 +14,23 @@ function Controls({ getCanvas }: { getCanvas: () => FabricCanvas }) {
     let y = 0;
 
     /* Mousedown */
-    function mousedown(e) {
+    const mousedown = (event) => {
       if (!isSelectionActive) {
         return false;
       }
 
       // allow user to select existing rectangle
-      if (e.target === selectionRef.current) {
+      if (event.target === selectionRef.current) {
         return false;
       }
 
       // ensure object does not preserve aspect ratio
       canvas.set("uniformScaling", true);
 
-      const mouse = e.pointer;
       started = true;
-      x = mouse.x;
-      y = mouse.y;
+      const mouse = event.e;
+      x = mouse.pageX - canvas._offset.left;
+      y = mouse.pageY - canvas._offset.top;
 
       const foundObject = canvas
         .getObjects()
@@ -56,12 +56,13 @@ function Controls({ getCanvas }: { getCanvas: () => FabricCanvas }) {
       });
 
       canvas.add(square);
+      canvas.bringObjectToFront(square);
       canvas.setActiveObject(square);
       selectionRef.current = square;
-    }
+    };
 
     /* Mousemove */
-    function mousemove(e) {
+    const mousemove = (event) => {
       if (!isSelectionActive) {
         return false;
       }
@@ -70,26 +71,50 @@ function Controls({ getCanvas }: { getCanvas: () => FabricCanvas }) {
         return false;
       }
 
-      const mouse = e.pointer;
+      const mouse = event.e;
+      const mouseX = mouse.pageX - canvas._offset.left;
+      const mouseY = mouse.pageY - canvas._offset.top;
+      let width = mouseX - x;
+      let height = mouseY - y;
 
-      const w = Math.abs(mouse.x - x);
-      const h = Math.abs(mouse.y - y);
-
-      if (!w || !h) {
+      if (!width || !height) {
         return false;
+      }
+
+      // Determine the rectangle's new position and size
+      let newLeft;
+      let newTop;
+
+      if (width < 0) {
+        newLeft = mouseX;
+        width = -width;
+      } else {
+        newLeft = x;
+      }
+
+      if (height < 0) {
+        newTop = mouseY;
+        height = -height;
+      } else {
+        newTop = y;
       }
 
       const square = canvas.getActiveObject();
 
       if (square) {
-        square.set("width", w);
-        square.set("height", h);
+        square.set({
+          width,
+          height,
+          left: newLeft,
+          top: newTop,
+        });
+
         canvas.renderAll();
       }
-    }
+    };
 
     /* Mouseup */
-    function mouseup(e) {
+    const mouseup = (e) => {
       // if selection tool inactive then remove selection square
       if (!isSelectionActive && e.target !== selectionRef.current) {
         const square = canvas
@@ -127,7 +152,7 @@ function Controls({ getCanvas }: { getCanvas: () => FabricCanvas }) {
         canvas.renderAll();
         selectionRef.current = square as Rect;
       }
-    }
+    };
 
     if (canvas) {
       canvas.on("mouse:down", mousedown);
