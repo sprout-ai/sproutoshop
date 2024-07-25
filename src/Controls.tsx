@@ -312,6 +312,16 @@ function useSelectionTool({
   }, [isSelectionActive]);
 }
 
+function generateRedactPath({
+  height,
+  width,
+}: {
+  height: number;
+  width: number;
+}) {
+  return `M0 0L${width} ${height}M0 ${height}L${width} 0M0 0H${width}V${height}H0V0Z`;
+}
+
 function useRedactionTool({ isRedactionActive, getCanvas }) {
   const prevRect = useRef<Path | null>(null);
 
@@ -342,12 +352,13 @@ function useRedactionTool({ isRedactionActive, getCanvas }) {
       x = mouse.pageX - canvas._offset.left;
       y = mouse.pageY - canvas._offset.top;
 
-      const square = new Path("M0 0h0v0H0Z", {
+      const square = new Path(generateRedactPath({ width: 0, height: 0 }), {
         // width: 0,
         // height: 0,
         left: x,
         top: y,
         fill: "black",
+        stroke: "grey",
         uniformScaling: false,
         cornerColor: "blue",
         transparentCorners: false,
@@ -403,9 +414,11 @@ function useRedactionTool({ isRedactionActive, getCanvas }) {
 
       if (square) {
         // having to do this roundabout way to update path
-        const updatedPath = new Path(`M0 0h${width}v${height}H0Z`, {
+        const updatedPath = new Path(generateRedactPath({ width, height }), {
           left: newLeft,
           top: newTop,
+          width,
+          height,
           fill: "black",
           uniformScaling: false,
           cornerColor: "blue",
@@ -415,6 +428,8 @@ function useRedactionTool({ isRedactionActive, getCanvas }) {
         });
 
         square.set({
+          left: newLeft,
+          top: newTop,
           path: updatedPath.path,
           width: updatedPath.width,
           height: updatedPath.height,
@@ -441,26 +456,39 @@ function useRedactionTool({ isRedactionActive, getCanvas }) {
         const height = square.get("height");
         const width = square.get("width");
 
+        let newPath: Path;
+
         if (!height && !width) {
-          square.set({
-            // width: 100,
-            // height: 25,
-            path: `M0 0h100v25H0Z`,
+          newPath = new Path(generateRedactPath({ width: 100, height: 25 }), {
+            left: square.left,
+            top: square.top,
+            width: 100,
+            height: 25,
+            fill: "black",
+            stroke: "grey",
+            border: "none",
+            uniformScaling: false,
+            cornerColor: "blue",
+            transparentCorners: false,
+            cornerStrokeColor: "white",
+            cornerStyle: "circle",
+          });
+        } else {
+          newPath = new Path(generateRedactPath({ width, height }), {
+            left: square.left,
+            top: square.top,
+            width: square.width,
+            height: square.height,
+            fill: "black",
+            stroke: "grey",
+            border: "none",
+            uniformScaling: false,
+            cornerColor: "blue",
+            transparentCorners: false,
+            cornerStrokeColor: "white",
+            cornerStyle: "circle",
           });
         }
-
-        const newPath = new Path(`M0 0h${width}v${height}H0Z`, {
-          left: square.left,
-          top: square.top,
-          width: square.width,
-          height: square.height,
-          fill: "black",
-          uniformScaling: false,
-          cornerColor: "blue",
-          transparentCorners: false,
-          cornerStrokeColor: "white",
-          cornerStyle: "circle",
-        });
 
         canvas.remove(square);
         canvas.add(newPath);
@@ -469,6 +497,7 @@ function useRedactionTool({ isRedactionActive, getCanvas }) {
         });
         canvas.setActiveObject(newPath);
         canvas.renderAll();
+        console.log(canvas.getObjects());
         prevRect.current = newPath;
       }
     };
