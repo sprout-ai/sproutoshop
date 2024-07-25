@@ -1,13 +1,15 @@
 import styles from "./App.module.css";
 
 import type { Canvas as FabricCanvas } from "fabric";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { FabricImage } from "fabric";
 import { Canvas } from "./Canvas.tsx";
 import { Controls } from "./Controls.tsx";
 import { Thumbnails } from "./Thumbnails.tsx";
 
 function App() {
+  const [hasLoaded, setHasLoaded] = useState(false);
+
   // elements
   const headerRef = useRef<HTMLDivElement>(null);
   const canvasContainerRef = useRef<HTMLDivElement>(null);
@@ -64,13 +66,13 @@ function App() {
     // set object as active
     canvas.setActiveObject(oImg);
 
-    // canvas.add(new fabric.Rect({ width: 100, height: 100, fill: "red" }));
+    setHasLoaded(true);
   };
 
   return (
     <div className={styles.container}>
       <div className={styles.header} ref={headerRef}>
-        <Controls getCanvas={getCanvas} />
+        {hasLoaded && <Controls getCanvas={getCanvas} />}
       </div>
 
       <div className={styles.canvas_container}>

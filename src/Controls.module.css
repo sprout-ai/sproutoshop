@@ -14,13 +14,9 @@
   padding: 8px;
   cursor: pointer;
 }
-
-.selection {
-
-}
-.selection--active {
+.buttonActive {
   background: green;
 }
-.selection--inactive {
+.buttonInactive {
   background: inherit;
 }
